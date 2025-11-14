@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  zipkin:
+    image: openzipkin/zipkin:3.4
+    ports:
+      - "9411:9411"
+    networks:
+      - app-network
+
+  service-a:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      - SERVICE=A
+      - SERVICE_B_URL=http://service-b:8081
+      - ZIPKIN_ENDPOINT=http://zipkin:9411/api/v2/spans
+    depends_on:
+      - service-b
+      - zipkin
+    networks:
+      - app-network
+
+  service-b:
+    build: .
+    ports:
+      - "8081:8081"
+    environment:
+      - SERVICE=B
+      - ZIPKIN_ENDPOINT=http://zipkin:9411/api/v2/spans
+    depends_on:
+      - zipkin
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
