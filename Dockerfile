@@ -1,11 +1,19 @@
-FROM golang:1.25.1 AS builder
-WORKDIR /app
-COPY . .
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o main
+FROM golang:1.25.1-alpine AS dev
 
-FROM alpine:latest
-RUN apk --no-cache add ca-certificates tzdata
+# Instalar ferramentas de desenvolvimento
+RUN apk add --no-cache git ca-certificates tzdata wget curl
+
+# Instalar Air para hot reload
+RUN go install github.com/air-verse/air@latest
+
 WORKDIR /app
-COPY --from=builder /app/main .
+
+# Copiar arquivos de configuração Go
+COPY go.mod go.sum ./
+RUN go mod download
+
+# Expor portas
 EXPOSE 8080 8081
-ENTRYPOINT ["./main"]
+
+# Comando padrão para desenvolvimento
+CMD ["air", "-c", ".air.toml"]

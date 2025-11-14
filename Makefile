@@ -53,13 +53,22 @@ docker-run-a: docker-build
 docker-run-b: docker-build
 	docker run -p 8081:8081 -e SERVICE=B $(DOCKER_IMAGE)
 
-# Subir ambos serviços com Docker Compose
-docker-compose-up:
+# Subir ambiente de desenvolvimento (com hot reload)
+dev-up:
 	docker-compose up --build
 
-# Parar Docker Compose
-docker-compose-down:
+# Parar ambiente de desenvolvimento
+dev-down:
 	docker-compose down
+
+# Logs do ambiente de desenvolvimento
+dev-logs:
+	docker-compose logs -f
+
+# Rebuild desenvolvimento
+dev-rebuild:
+	docker-compose down
+	docker-compose up --build
 
 # Executar em background para testes
 run-background: build
@@ -88,8 +97,10 @@ help:
 	@echo "  trace-demo         - Demonstração do tracing distribuído"
 	@echo "  demo               - Demo completo com verificação de Zipkin"
 	@echo "  zipkin-ui          - Abre a interface do Zipkin"
-	@echo "  docker-compose-up  - Sobe ambos serviços via Docker Compose"
-	@echo "  docker-compose-down - Para os serviços do Docker Compose"
+	@echo "  dev-up             - Sobe ambiente de desenvolvimento (hot reload)"
+	@echo "  dev-down           - Para ambiente de desenvolvimento"
+	@echo "  dev-logs           - Visualizar logs do ambiente dev"
+	@echo "  dev-rebuild        - Rebuild ambiente de desenvolvimento"
 	@echo "  run-background     - Executa em background para testes"
 	@echo "  stop-background    - Para os processos em background"
 	@echo "  check-services     - Verifica se os serviços estão rodando"
